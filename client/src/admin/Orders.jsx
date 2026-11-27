@@ -5,6 +5,7 @@ import Loader from "../components/ui/Loader";
 import SafeImage from "../components/SafeImage";
 import { notify } from "../components/ui/notify";
 import { PageHead, fmtDate } from "./ui";
+import AdminSelect from "./components/AdminSelect";
 
 const money = (paise) => `₹${(paise / 100).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
 const statuses = [
@@ -125,14 +126,13 @@ export default function Orders() {
                 <details className="admin-tracking-editor">
                   <summary><i className="bi bi-truck me-2" />Update delivery tracking</summary>
                   <form className="order-tracking-form" onSubmit={(event) => saveTracking(event, order)}>
-                    <select
+                    <AdminSelect
                       className="form-select form-select-sm glass-input"
                       value={draftFor(order).fulfillmentStatus}
-                      onChange={(event) => updateDraft(order, "fulfillmentStatus", event.target.value)}
-                      aria-label="Delivery status"
-                    >
-                      {statuses.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
-                    </select>
+                      onChange={(value) => updateDraft(order, "fulfillmentStatus", value)}
+                      options={statuses.map(([value, label]) => ({ value, label }))}
+                      ariaLabel="Delivery status"
+                    />
                     <input
                       className="form-control form-control-sm glass-input"
                       placeholder="Courier name"

@@ -9,6 +9,7 @@ import ImageInput from "./ImageInput";
 import { Field, PageHead } from "./ui";
 import RecordDetailsModal from "./RecordDetailsModal";
 import DataTable from "./components/DataTable";
+import AdminSelect from "./components/AdminSelect";
 
 const TYPES = [
   { id: "home", label: "Homepage sections", keys: ["hero", "features", "banner"], hint: "hero: title + subtitle. features: title + items (icon like bi-truck, title, text). banner: title, subtitle, image." },
@@ -112,9 +113,13 @@ export default function Cms() {
           <form onSubmit={save} className="row g-3">
             <Field label="Page / section key" className="col-12 col-md-4">
               {cfg.keys ? (
-                <select className="form-select glass-input" value={f.key} onChange={set("key")} disabled={!!f.id}>
-                  {cfg.keys.map((k) => <option key={k}>{k}</option>)}
-                </select>
+                <AdminSelect
+                  value={f.key}
+                  onChange={(key) => setF((current) => ({ ...current, key }))}
+                  options={cfg.keys.map((key) => ({ value: key, label: key }))}
+                  ariaLabel="Page or section key"
+                  disabled={!!f.id}
+                />
               ) : (
                 <input className="form-control glass-input" placeholder="auto from title" value={f.key} onChange={set("key")} disabled={!!f.id} />
               )}

@@ -7,6 +7,7 @@ import Loader from "../components/ui/Loader";
 import GlassCard from "../components/GlassCard";
 import { Field, PageHead } from "./ui";
 import DataTable from "./components/DataTable";
+import AdminSelect from "./components/AdminSelect";
 
 const blank = { product: "", color: "", size: "", location: "Main Warehouse", qty: 0, reorderLevel: 5 };
 
@@ -29,6 +30,10 @@ export default function Inventory() {
 
   const add = async (e) => {
     e.preventDefault();
+    if (!row.product || !row.color || !row.size) {
+      notify.error("Select a product, colour and size.");
+      return;
+    }
     try {
       await adminApi.inventory.create({ ...row, qty: Number(row.qty), reorderLevel: Number(row.reorderLevel) });
       notify.success("Stock saved");
@@ -65,7 +70,6 @@ export default function Inventory() {
   };
 
   const sum = data?.summary;
-  const setF = (k) => (e) => setFilters((f) => ({ ...f, [k]: e.target.value }));
   const columns = [
     { key: "product", label: "Product", searchValue: (r) => r.product.name, sortValue: (r) => r.product.name, render: (_, r) => r.product.name },
     { key: "color", label: "Colour" },
@@ -125,22 +129,31 @@ export default function Inventory() {
           <p className="text-muted-olive small">If the same product, colour, size and location already exists, its quantity is replaced.</p>
           <form onSubmit={add} className="row g-3">
             <Field label="Product" className="col-12 col-md-4">
-              <select required className="form-select glass-input" value={row.product} onChange={(e) => setRow({ ...row, product: e.target.value, color: "", size: "" })}>
-                <option value="">Select product</option>
-                {products?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-              </select>
+              <AdminSelect
+                required
+                value={row.product}
+                onChange={(product) => setRow((current) => ({ ...current, product, color: "", size: "" }))}
+                options={[{ value: "", label: "Select product" }, ...(products || []).map((product) => ({ value: product.id, label: product.name }))]}
+                ariaLabel="Product"
+              />
             </Field>
             <Field label="Colour" className="col-6 col-md-2">
-              <select required className="form-select glass-input" value={row.color} onChange={(e) => setRow({ ...row, color: e.target.value })}>
-                <option value="">Select</option>
-                {selected?.colors.map((c) => <option key={c.name}>{c.name}</option>)}
-              </select>
+              <AdminSelect
+                required
+                value={row.color}
+                onChange={(color) => setRow((current) => ({ ...current, color }))}
+                options={[{ value: "", label: "Select" }, ...(selected?.colors || []).map((color) => ({ value: color.name, label: color.name }))]}
+                ariaLabel="Colour"
+              />
             </Field>
             <Field label="Size" className="col-6 col-md-2">
-              <select required className="form-select glass-input" value={row.size} onChange={(e) => setRow({ ...row, size: e.target.value })}>
-                <option value="">Select</option>
-                {selected?.sizes.map((s) => <option key={s}>{s}</option>)}
-              </select>
+              <AdminSelect
+                required
+                value={row.size}
+                onChange={(size) => setRow((current) => ({ ...current, size }))}
+                options={[{ value: "", label: "Select" }, ...(selected?.sizes || []).map((size) => ({ value: size, label: size }))]}
+                ariaLabel="Size"
+              />
             </Field>
             <Field label="Location" className="col-12 col-md-4">
               <input list="locs" className="form-control glass-input" value={row.location} onChange={(e) => setRow({ ...row, location: e.target.value })} />
@@ -155,16 +168,20 @@ export default function Inventory() {
 
       <div className="row g-2 mb-3">
         <div className="col-12 col-md-4">
-          <select className="form-select glass-input" value={filters.product} onChange={setF("product")}>
-            <option value="">All products</option>
-            {products?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-          </select>
+          <AdminSelect
+            value={filters.product}
+            onChange={(product) => setFilters((current) => ({ ...current, product }))}
+            options={[{ value: "", label: "All products" }, ...(products || []).map((product) => ({ value: product.id, label: product.name }))]}
+            ariaLabel="Filter by product"
+          />
         </div>
         <div className="col-6 col-md-3">
-          <select className="form-select glass-input" value={filters.location} onChange={setF("location")}>
-            <option value="">All locations</option>
-            {locations?.map((l) => <option key={l}>{l}</option>)}
-          </select>
+          <AdminSelect
+            value={filters.location}
+            onChange={(location) => setFilters((current) => ({ ...current, location }))}
+            options={[{ value: "", label: "All locations" }, ...(locations || []).map((location) => ({ value: location, label: location }))]}
+            ariaLabel="Filter by location"
+          />
         </div>
         <div className="col-6 col-md-3 d-flex align-items-center">
           <div className="form-check">

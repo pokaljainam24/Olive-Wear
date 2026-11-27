@@ -9,6 +9,7 @@ import ImageInput from "./ImageInput";
 import { Field, PageHead } from "./ui";
 import RecordDetailsModal from "./RecordDetailsModal";
 import DataTable from "./components/DataTable";
+import AdminSelect from "./components/AdminSelect";
 
 const empty = { name: "", type: "category", description: "", image: "", order: 0, active: true };
 
@@ -94,9 +95,12 @@ export default function Categories() {
           <form onSubmit={save} className="row g-3">
             <Field label="Name" className="col-12 col-md-6"><input required className="form-control glass-input" value={f.name} onChange={set("name")} /></Field>
             <Field label="Type" className="col-6 col-md-3">
-              <select className="form-select glass-input" value={f.type} onChange={set("type")}>
-                <option value="category">Category</option><option value="collection">Collection</option>
-              </select>
+              <AdminSelect
+                value={f.type}
+                onChange={(type) => setF((current) => ({ ...current, type }))}
+                options={[{ value: "category", label: "Category" }, { value: "collection", label: "Collection" }]}
+                ariaLabel="Type"
+              />
             </Field>
             <Field label="Order" className="col-6 col-md-3"><input type="number" className="form-control glass-input" value={f.order} onChange={set("order")} /></Field>
             <Field label="Short text"><input className="form-control glass-input" value={f.description} onChange={set("description")} /></Field>

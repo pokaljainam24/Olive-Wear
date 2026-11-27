@@ -7,6 +7,7 @@ import Loader from "../components/ui/Loader";
 import GlassCard from "../components/GlassCard";
 import ImageInput from "./ImageInput";
 import { Field, PageHead } from "./ui";
+import AdminSelect from "./components/AdminSelect";
 
 const empty = {
   name: "", category: "", collectionName: "", price: "", tag: "", img: "", gallery: "", description: "", fabric: "",
@@ -32,6 +33,10 @@ export default function ProductForm() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (!f.category) {
+      notify.error("Please select a category.");
+      return;
+    }
     const body = {
       name: f.name, category: f.category, collectionName: f.collectionName, price: Number(f.price), tag: f.tag, img: f.img,
       gallery: list(f.gallery, "\n"), description: f.description, fabric: f.fabric, sizes: list(f.sizes, ","), active: f.active,
@@ -67,16 +72,21 @@ export default function ProductForm() {
           <Field label="Price (₹)" className="col-6 col-md-3"><input required type="number" min="0" className="form-control glass-input" value={f.price} onChange={set("price")} /></Field>
           <Field label="Tag (New, Bestseller...)" className="col-6 col-md-3"><input className="form-control glass-input" value={f.tag} onChange={set("tag")} /></Field>
           <Field label="Category" className="col-12 col-md-4">
-            <select required className="form-select glass-input" value={f.category} onChange={set("category")}>
-              <option value="">Select category</option>
-              {categories.map((c) => <option key={c.id}>{c.name}</option>)}
-            </select>
+            <AdminSelect
+              required
+              value={f.category}
+              onChange={(category) => setF((current) => ({ ...current, category }))}
+              options={[{ value: "", label: "Select category" }, ...categories.map((category) => ({ value: category.name, label: category.name }))]}
+              ariaLabel="Category"
+            />
           </Field>
           <Field label="Collection" className="col-12 col-md-4">
-            <select className="form-select glass-input" value={f.collectionName} onChange={set("collectionName")}>
-              <option value="">None</option>
-              {collections.map((c) => <option key={c.id}>{c.name}</option>)}
-            </select>
+            <AdminSelect
+              value={f.collectionName}
+              onChange={(collectionName) => setF((current) => ({ ...current, collectionName }))}
+              options={[{ value: "", label: "None" }, ...collections.map((collection) => ({ value: collection.name, label: collection.name }))]}
+              ariaLabel="Collection"
+            />
           </Field>
           <Field label="Fabric" className="col-12 col-md-4"><input className="form-control glass-input" value={f.fabric} onChange={set("fabric")} /></Field>
           <Field label="Description"><textarea rows="3" className="form-control glass-input" value={f.description} onChange={set("description")} /></Field>

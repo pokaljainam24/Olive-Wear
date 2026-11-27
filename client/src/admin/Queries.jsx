@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { adminApi } from "../api/admin";
 import useFetch from "../hooks/useFetch";
 import { useConfirm } from "../components/ui/ConfirmProvider";
@@ -5,18 +6,44 @@ import { notify } from "../components/ui/notify";
 import Loader from "../components/ui/Loader";
 import { PageHead, fmtDate } from "./ui";
 import DataTable from "./components/DataTable";
+import AdminSelect from "./components/AdminSelect";
 
 export default function Queries() {
   const { data, loading, error, reload } = useFetch(() => adminApi.queries.list());
   const confirm = useConfirm();
+  const [updating, setUpdating] = useState(() => new Map());
+  const [statusOverrides, setStatusOverrides] = useState(() => new Map());
+
+  useEffect(() => {
+    if (!data) return;
+    setStatusOverrides((current) => {
+      const next = new Map(current);
+      let changed = false;
+      data.forEach((query) => {
+        if (next.get(query.id) === query.status) {
+          next.delete(query.id);
+          changed = true;
+        }
+      });
+      return changed ? next : current;
+    });
+  }, [data]);
 
   const setStatus = async (q, status) => {
+    setUpdating((current) => new Map(current).set(q.id, status));
     try {
       await adminApi.queries.update(q.id, { status });
+      setStatusOverrides((current) => new Map(current).set(q.id, status));
       notify.success("Status updated");
       reload(true);
     } catch (e) {
       notify.error(e.message);
+    } finally {
+      setUpdating((current) => {
+        const next = new Map(current);
+        next.delete(q.id);
+        return next;
+      });
     }
   };
 
@@ -52,9 +79,24 @@ export default function Queries() {
       label: "Status",
       sortable: false,
       render: (status, q) => (
-        <select className="form-select form-select-sm glass-input" value={status} onChange={(event) => setStatus(q, event.target.value)}>
-          <option value="new">New</option><option value="read">Read</option><option value="resolved">Resolved</option>
-        </select>
+        updating.has(q.id) ? (
+          <div className="query-status-loading" role="status" aria-live="polite">
+            <span className="spinner-border spinner-border-sm" aria-hidden="true" />
+            {updating.get(q.id) === "resolved" ? "Resolving..." : "Updating..."}
+          </div>
+        ) : (
+          <AdminSelect
+            className="form-select form-select-sm glass-input"
+            value={statusOverrides.get(q.id) || status}
+            onChange={(value) => setStatus(q, value)}
+            options={[
+              { value: "new", label: "New" },
+              { value: "read", label: "Read" },
+              { value: "resolved", label: "Resolved" },
+            ]}
+            ariaLabel="Query status"
+          />
+        )
       ),
     },
     {

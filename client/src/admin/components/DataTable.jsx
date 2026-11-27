@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import AdminSelect from "./AdminSelect";
 
 const asText = (value) => {
   if (value === null || value === undefined || typeof value === "object") return "";
@@ -93,20 +94,19 @@ export default function DataTable({
             />
           </label>
         )}
-        <label className="admin-datatable-page-size">
+        <div className="admin-datatable-page-size">
           <span>Rows</span>
-          <select
+          <AdminSelect
             className="form-select form-select-sm glass-input"
             value={rowsPerPage}
-            onChange={(event) => {
-              setRowsPerPage(Number(event.target.value));
+            onChange={(value) => {
+              setRowsPerPage(Number(value));
               setCurrentPage(1);
             }}
-            aria-label="Rows per page"
-          >
-            {[10, 25, 50].map((size) => <option key={size} value={size}>{size}</option>)}
-          </select>
-        </label>
+            options={[10, 25, 50].map((size) => ({ value: size, label: String(size) }))}
+            ariaLabel="Rows per page"
+          />
+        </div>
       </div>
 
       <div className="table-responsive">
