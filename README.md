@@ -259,5 +259,5 @@ Released under the [MIT License](LICENSE). Replace this section if you choose a 
 ---
 
 <div align="center">
-Made with 🌿 by <a href="https://github.com/<your-username>">your-name</a>
+Made with 🌿 by <a href="https://github.com/<your-username>">Jainam Pokal</a>
 </div>
