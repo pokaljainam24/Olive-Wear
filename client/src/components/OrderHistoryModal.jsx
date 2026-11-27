@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { shopApi } from "../api/shop";
 import { readOrderHistoryTokens, saveOrderHistoryToken } from "../utils/orderHistory";
 import SafeImage from "./SafeImage";
@@ -18,8 +18,16 @@ const date = (value) => new Date(value).toLocaleString("en-IN", {
 
 export default function OrderHistoryModal({ open, onClose }) {
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isScrolling, setIsScrolling] = useState(false);
   const [result, setResult] = useState({ orders: [], loading: false, error: "", hasAccess: false });
   const [recovery, setRecovery] = useState({ email: "", otp: "", requestId: "", busy: false, error: "" });
+  const scrollTimeout = useRef(null);
+
+  const handleContentScroll = () => {
+    setIsScrolling(true);
+    window.clearTimeout(scrollTimeout.current);
+    scrollTimeout.current = window.setTimeout(() => setIsScrolling(false), 800);
+  };
 
   const requestRecoveryCode = async (event) => {
     event.preventDefault();
@@ -88,6 +96,8 @@ export default function OrderHistoryModal({ open, onClose }) {
     };
   }, [open, onClose]);
 
+  useEffect(() => () => window.clearTimeout(scrollTimeout.current), []);
+
   if (!open) return null;
 
   return (
@@ -116,7 +126,7 @@ export default function OrderHistoryModal({ open, onClose }) {
           </div>
         </header>
 
-        <div className="order-history-content">
+        <div className={`order-history-content${isScrolling ? " is-scrolling" : ""}`} onScroll={handleContentScroll}>
           {result.loading && <div className="order-history-message"><span className="spinner-border spinner-border-sm" /> Loading your orders...</div>}
           {result.error && <div className="order-history-message text-danger">{result.error}</div>}
           {!result.loading && !result.error && !result.orders.length && (
@@ -169,14 +179,16 @@ export default function OrderHistoryModal({ open, onClose }) {
                       </a>
                     )}
                   </div>
-                  <ol className="history-timeline">
-                    {stages.map((stage, index) => (
-                      <li className={index <= activeStage ? "complete" : ""} key={stage.value}>
-                        <span className="history-timeline-dot" />
-                        <span>{stage.label}</span>
-                      </li>
-                    ))}
-                  </ol>
+                  <div className="history-timeline-wrap">
+                    <ol className="history-timeline">
+                      {stages.map((stage, index) => (
+                        <li className={index <= activeStage ? "complete" : ""} key={stage.value}>
+                          <span className="history-timeline-dot" />
+                          <span>{stage.label}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
                   {(order.shippingProvider || order.trackingNumber) && (
                     <div className="history-tracking-meta">
                       {order.shippingProvider && <span>{order.shippingProvider}</span>}

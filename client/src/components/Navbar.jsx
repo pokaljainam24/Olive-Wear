@@ -47,12 +47,13 @@ export default function Navbar() {
               type="button"
               className="btn btn-outline-olive btn-sm order-history-trigger"
               onClick={() => setHistoryOpen(true)}
-              aria-label="Order history"
+              aria-label="Orders"
               aria-haspopup="dialog"
               aria-expanded={historyOpen}
-              title="Order history"
+              title="Orders"
             >
               <i className="bi bi-box-seam" />
+              <span>Orders</span>
             </button>
             <button type="button" className="btn btn-olive btn-sm px-4" onClick={openCart}>
               Cart ({itemCount})
