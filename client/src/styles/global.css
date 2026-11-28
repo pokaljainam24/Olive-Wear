@@ -124,6 +124,101 @@ section[id] {
   color: var(--olive-light);
 }
 
+.mobile-nav-backdrop,
+.mobile-nav-drawer {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .site-nav .navbar-toggler {
+    margin-left: auto;
+  }
+
+  .mobile-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1040;
+    border: 0;
+    background: rgba(0, 0, 0, 0.58);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+
+  .mobile-nav-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-nav-drawer {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    inset: 0 0 0 auto;
+    z-index: 1045;
+    width: min(88vw, 360px);
+    padding: 1.25rem;
+    overflow-y: auto;
+    color: var(--mist);
+    background: #10140b;
+    border-left: 1px solid var(--glass-border);
+    box-shadow: -20px 0 50px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform 0.25s ease, visibility 0.25s ease;
+  }
+
+  .mobile-nav-drawer.show {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 1.25rem;
+    color: var(--olive-light);
+    font-weight: 700;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .mobile-nav-close {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    color: var(--mist);
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    border-radius: 0.5rem;
+  }
+
+  .mobile-nav-links {
+    gap: 0.35rem;
+    padding: 1rem 0;
+  }
+
+  .mobile-nav-links .nav-link {
+    padding: 0.8rem 0.25rem;
+    color: var(--mist);
+    font-size: 1.1rem;
+  }
+
+  .mobile-nav-actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+  }
+
+  .mobile-nav-actions .btn {
+    min-height: 2.75rem;
+  }
+}
+
 /* Hero */
 .hero {
   min-height: 100vh;
